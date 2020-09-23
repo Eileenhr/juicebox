@@ -1,8 +1,10 @@
-// inside db/index.js
+
 const { Client } = require('pg'); // imports the pg module
 
 // supply the db name and location of the database
 const client = new Client('postgres://localhost:5432/juicebox-dev');
+
+
 
 //========📌================== 
 
@@ -29,14 +31,12 @@ async function createUser({
 //========📌==================
 
 async function updateUser(id, fields = {}) {
-  // build the set string
+ 
   const setString = Object.keys(fields).map(
     (key, index) => `"${ key }"=$${ index + 1 }`
   ).join(', ');
   console.log('setString: ', setString);
   
-
-  // return early if this is called without fields
   if (setString.length === 0) {
     return;
   }
@@ -57,8 +57,6 @@ async function updateUser(id, fields = {}) {
 }
 
 //========📌==================
-
-// inside db/index.js
 
 async function getAllUsers() {
   try {
@@ -101,7 +99,7 @@ async function createPost({
   authorId,
   title,
   content,
-  tags = [] // this is new
+  tags = [] 
 }) {
   try {
     const { rows: [ post ] } = await client.query(`
@@ -214,20 +212,14 @@ async function createTags(tagList) {
   if(tagList.length === 0) {
     return;
   }
-
-    // need something like: $1), ($2), ($3 
     const insertValues = tagList.map(
       (_, index) => `$${index + 1}`).join('), (');
     // then we can use: (${ insertValues }) in our string template
-
-
     console.log('tagList: ', tagList);
-  // need something like $1, $2, $3
-  const selectValues = tagList.map(
-    (_, index) => `$${index + 1}`).join(', ');
-  // then we can use (${ selectValues }) in our string template
 
-
+    const selectValues = tagList.map(
+      (_, index) => `$${index + 1}`).join(', ');
+    // then we can use (${ selectValues }) in our string template
 
   try {
     // insert the tags, doing nothing on conflict
@@ -248,38 +240,11 @@ async function createTags(tagList) {
     IN (${selectValues})
     `, tagList); 
     return rows;
-
-
-    // const { rows: tags } = await client.query(`
-    // INSERT INTO tags(name) 
-    // VALUES(${insertValues}) 
-    // ON CONFLICT (name) DO NOTHING;
-    // `, tagList);
-
-    // return tags;
-
-
     
   } catch (error) {
     throw error;
   }
 }
-
-//========📌==================
-
-// async function getTagsByUser(userId) {
-//   try {
-//     const { rows } = await client.query(`
-//       SELECT * 
-//       FROM tags
-//       IN ($1, $2, $3);
-//     `);
-
-//     return rows;
-//   } catch (error) {
-//     throw error;
-//   }
-// }
 
 //========📌==================
 
@@ -297,16 +262,32 @@ async function createPostTag(postId, tagId) {
 
 //========📌==================
 
+async function getAllTags() {
+  try {
+    const { rows: tagIds } = await client.query(`
+      SELECT id
+      FROM tags;
+    `);
+
+    const tags = await Promise.all(tagIds.map(
+      post => getTagsById( tag.id )
+    ));
+
+    return tags;
+  } catch (error) {
+    throw error;
+  }
+}
+
+//========📌==================
+
 async function addTagsToPost(postId, tagList) {
   try {
     const createPostTagPromises = tagList.map(
       tag => createPostTag(postId, tag.id)
     );
 
-    
-
     await Promise.all(createPostTagPromises);
-
     return await getPostById(postId);
   } catch (error) {
     throw error;
@@ -380,8 +361,8 @@ module.exports = {
   getAllPosts,
   getPostsByUser,
   createTags,
-  // getTagsByUser,
   createPostTag,
+  getAllTags,
   addTagsToPost,
   getPostById,
   getPostsByTagName

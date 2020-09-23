@@ -1,12 +1,21 @@
-// console.log("hello");
 
-// // inside db/index.js
-// const { Client } = require('pg'); // imports the pg module
+require('dotenv').config();
 
-// // supply the db name and location of the database
-// const client = new Client('postgres://localhost:5432/juicebox-dev');
+const express = require('express');
+const server = express();
+const morgan = require('morgan');
+const bodyParser = require('body-parser');
+const apiRouter = require('./api');
+const { client } = require('./db');
+client.connect();
+server.use(bodyParser.json());
+server.use(morgan('dev'));
+server.use('/api', apiRouter);
 
-// module.exports = {
-//   client,
-// }
+const { PORT = 8000 } = process.env;
+server.listen(PORT, function() {
+  console.log(`The server is up on port http://localhost:${PORT}`)
+})
+
+
 
