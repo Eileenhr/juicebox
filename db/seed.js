@@ -5,19 +5,18 @@ const {
   updateUser,
   getAllUsers,
   getUserById,
+  getUserByUsername,
   createPost,
   updatePost,
   getAllPosts,
+  getPostById,
   getPostsByUser,
+  getPostsByTagName,
   createTags,
   createPostTag,
-  getAllTags,
   addTagsToPost,
-  getPostById,
-  getPostsByTagName
+  getAllTags,
 } = require('./index');
-
-//========📌==================
 
 async function dropTables() {
   try {
@@ -35,8 +34,6 @@ async function dropTables() {
   }
 }
 
-//========📌==================
-
 async function createTables() {
   try {
     console.log("Starting to build tables...");
@@ -51,7 +48,7 @@ async function createTables() {
       );
       CREATE TABLE posts (
         id SERIAL PRIMARY KEY,
-        "authorId" INTEGER REFERENCES users(id) NOT NULL,
+        "authorId" INTEGER REFERENCES users(id),
         title VARCHAR(255) NOT NULL,
         content TEXT NOT NULL,
         active BOOLEAN DEFAULT true
@@ -72,8 +69,6 @@ async function createTables() {
     throw error;
   }
 }
-
-//========📌==================
 
 async function createInitialUsers() {
   try {
@@ -104,8 +99,6 @@ async function createInitialUsers() {
     throw error; 
   }
 }
-
-//========📌==================
 
 async function createInitialPosts() {
   try {
@@ -139,8 +132,6 @@ async function createInitialPosts() {
   }
 }
 
-//========📌==================
-
 async function rebuildDB() {
   try {
     client.connect();
@@ -153,8 +144,6 @@ async function rebuildDB() {
     throw error;
   }
 }
-
-//========📌==================
 
 async function testDB() {
   try {
@@ -182,15 +171,19 @@ async function testDB() {
     });
     console.log("Result:", updatePostResult);
 
+    console.log("Calling updatePost on posts[1], only updating tags");
+    const updatePostTagsResult = await updatePost(posts[1].id, {
+      tags: ["#youcandoanything", "#redfish", "#bluefish"]
+    });
+    console.log("Result:", updatePostTagsResult);
+
     console.log("Calling getUserById with 1");
     const albert = await getUserById(1);
     console.log("Result:", albert);
 
-    console.log("Calling updatePost on posts[1], only updating tags");
-    const updatePostTagsResult = await updatePost(posts[0].id, {
-      tags: ["#youcandoanything", "#redfish", "#bluefish"]
-    });
-    console.log("Result:", updatePostTagsResult);
+    console.log("Calling getAllTags");
+    const allTags = await getAllTags();
+    console.log("Result:", allTags);
 
     console.log("Calling getPostsByTagName with #happy");
     const postsWithHappy = await getPostsByTagName("#happy");
@@ -203,12 +196,8 @@ async function testDB() {
   }
 }
 
-//========📌==================
-
 rebuildDB()
   .then(testDB)
   .catch(console.error)
   .finally(() => client.end());
   
-//=========📌=========================
-
