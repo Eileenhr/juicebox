@@ -76,27 +76,27 @@ async function createInitialUsers() {
 
     await createUser({ 
       username: 'albert', 
-      password: 'bertie99', 
-      name: 'Al Bert', 
+      password: 'bertie99',
+      name: 'Al Bert',
       location: 'Sidney, Australia' 
     });
     await createUser({ 
       username: 'sandra', 
-      password: '2sandy4me', 
-      name: 'Just Sandra', 
-      location: 'Aint tellin' 
+      password: '2sandy4me',
+      name: 'Just Sandra',
+      location: 'Ain\'t tellin\''
     });
     await createUser({ 
-      username: 'glamgal', 
-      password: 'soglam', 
-      name: 'Joshua', 
-      location: 'Upper East Side' 
+      username: 'glamgal',
+      password: 'soglam',
+      name: 'Joshua',
+      location: 'Upper East Side'
     });
 
-    console.log("Finished creating users!"); 
-  } catch(error) {
+    console.log("Finished creating users!");
+  } catch (error) {
     console.error("Error creating users!");
-    throw error; 
+    throw error;
   }
 }
 

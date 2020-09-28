@@ -16,7 +16,7 @@ async function createUser({
       RETURNING *;
     `, [username, password, name, location]);
 
-    return rows;
+    return user;
   } catch (error) {
     throw error;
   }
